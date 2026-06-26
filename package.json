@@ -1,0 +1,15 @@
+{
+  "name": "mise-en-place",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --watch --env-file=.env server.js"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.80",
+    "@langchain/openai": "^0.5.18",
+    "express": "^4.22.2",
+    "micromark": "^4.0.2",
+    "zod": "^3.25.76"
+  }
+}
