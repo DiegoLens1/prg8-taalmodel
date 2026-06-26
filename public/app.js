@@ -85,10 +85,7 @@ async function sendMessage(message) {
     const data = await response.json();
 
     loadingIndicator.remove();
-    const bubble = appendMessage("ai", data.message);
-    if (data.tokens) {
-      tokenInfo.textContent = `${data.tokens.total_tokens} tokens`;
-    }
+    appendMessage("ai", data.message, data.tokens?.total_tokens);
 
     if (data.recept && data.recept.naam) {
       updateReceptPanel(data.recept);
@@ -107,7 +104,7 @@ async function sendMessage(message) {
   sendBtn.textContent = "Stuur";
 }
 
-function appendMessage(role, text) {
+function appendMessage(role, text, tokens) {
   const isUser = role === "user";
   const wrapper = document.createElement("div");
   wrapper.className = `chat ${isUser ? "chat-end" : "chat-start"}`;
@@ -129,6 +126,14 @@ function appendMessage(role, text) {
 
   wrapper.appendChild(avatar);
   wrapper.appendChild(bubble);
+
+  if (!isUser && tokens != null) {
+    const footer = document.createElement("div");
+    footer.className = "chat-footer text-xs text-base-content/40 mt-0.5";
+    footer.textContent = `${tokens} tokens`;
+    wrapper.appendChild(footer);
+  }
+
   chatContainer.appendChild(wrapper);
   chatContainer.scrollTop = chatContainer.scrollHeight;
   return wrapper;
