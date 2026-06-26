@@ -20,6 +20,7 @@ recognition.interimResults = false;
 
 // webspeech api
 micBtn.addEventListener("click", () => {
+  micBtn.classList.add("btn-active");
   recognition.start();
 });
 
@@ -28,6 +29,7 @@ recognition.addEventListener("result", (e) => {
 });
 
 recognition.addEventListener("end", () => {
+  micBtn.classList.remove("btn-active");
 });
 
 // Laad geschiedenis bij het starten
@@ -37,7 +39,6 @@ const data = await fetch("./api/gethistory", {
   body: JSON.stringify({ userId }),
 });
 const history = await data.json();
-console.log(history);
 for (const msg of history) {
   if (msg.role === "user") appendMessage("user", msg.content);
   if (msg.role === "assistant") appendMessage("ai", JSON.parse(msg.content).message);
@@ -72,7 +73,7 @@ async function sendMessage(message) {
   sendBtn.disabled = true;
   sendBtn.textContent = "...";
 
-  const loadingIndicator = appendMessage("ai", "Even nadenken...");
+  const loadingIndicator = appendLoadingBubble();
 
   try {
     const response = await fetch("/api/chat", {
@@ -86,9 +87,7 @@ async function sendMessage(message) {
     loadingIndicator.remove();
     const bubble = appendMessage("ai", data.message);
     if (data.tokens) {
-      const tokenSmall = document.createElement("small");
-      tokenSmall.textContent = `${data.tokens.total_tokens} tokens`;
-      bubble.appendChild(tokenSmall);
+      tokenInfo.textContent = `${data.tokens.total_tokens} tokens`;
     }
 
     if (data.recept && data.recept.naam) {
@@ -108,34 +107,70 @@ async function sendMessage(message) {
   sendBtn.textContent = "Stuur";
 }
 
-// Voeg een chatbericht toe
 function appendMessage(role, text) {
+  const isUser = role === "user";
+  const wrapper = document.createElement("div");
+  wrapper.className = `chat ${isUser ? "chat-end" : "chat-start"}`;
+
+  const avatar = document.createElement("div");
+  avatar.className = "chat-image avatar placeholder";
+  avatar.innerHTML = `<div class="w-8 rounded-full ${isUser ? "bg-primary" : "bg-base-200"} flex items-center justify-center text-sm">${isUser ? "🧑" : "🤖"}</div>`;
+
   const bubble = document.createElement("div");
-  if (role === "ai") {
-    bubble.innerHTML = micromark("AI: " + text);
+  bubble.className = `chat-bubble ${isUser ? "chat-bubble-primary" : "bg-base-200 text-base-content"} max-w-sm`;
+
+  if (isUser) {
+    bubble.textContent = text;
   } else {
-    bubble.textContent = "Jij: " + text;
+    bubble.innerHTML = micromark(text);
+    bubble.querySelectorAll("p").forEach(p => p.classList.add("mb-1"));
+    bubble.querySelectorAll("ul,ol").forEach(l => l.classList.add("list-disc", "pl-4", "mb-1"));
   }
-  chatContainer.appendChild(bubble);
+
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(bubble);
+  chatContainer.appendChild(wrapper);
   chatContainer.scrollTop = chatContainer.scrollHeight;
-  return bubble;
+  return wrapper;
 }
 
-// Update recept
+function appendLoadingBubble() {
+  const wrapper = document.createElement("div");
+  wrapper.className = "chat chat-start";
+  wrapper.innerHTML = `
+    <div class="chat-image avatar placeholder">
+      <div class="w-8 rounded-full bg-base-200 flex items-center justify-center text-sm">🤖</div>
+    </div>
+    <div class="chat-bubble bg-base-200 text-base-content">
+      <span class="loading loading-dots loading-sm"></span>
+    </div>`;
+  chatContainer.appendChild(wrapper);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  return wrapper;
+}
+
 function updateReceptPanel(recept) {
   receptPanel.innerHTML = `
-    <p class="">${recept.naam}</p>
-    <div class="">
-      <span>👥 ${recept.personen} personen</span>
-      <span>⏱️ ${recept.bereidingstijd}</span>
+    <h3 class="font-bold text-lg mb-2">${recept.naam}</h3>
+    <div class="flex gap-3 text-sm text-base-content/70 mb-3">
+      <span class="badge badge-outline">👥 ${recept.personen} pers.</span>
+      <span class="badge badge-outline">⏱️ ${recept.bereidingstijd}</span>
     </div>
-    <ol class="">
-      ${recept.stappen.map((stap) => `<li>${stap}</li>`).join("")}
-    </ol>
-  `;
+    <ol class="steps steps-vertical gap-0">
+      ${recept.stappen.map((stap) => `
+        <li class="step step-primary text-sm text-left">
+          <span class="ml-2">${stap}</span>
+        </li>`).join("")}
+    </ol>`;
 }
 
-// Update boodschappenlijst
 function updateBoodschappenPanel(boodschappenlijst) {
-  boodschappenPanel.innerHTML = `<ul>${boodschappenlijst.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+  boodschappenPanel.innerHTML = `
+    <ul class="space-y-1">
+      ${boodschappenlijst.map(item => `
+        <li class="flex items-center gap-2 text-sm py-1 border-b border-base-200 last:border-0">
+          <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" />
+          <span>${item}</span>
+        </li>`).join("")}
+    </ul>`;
 }

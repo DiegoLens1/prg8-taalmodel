@@ -1,43 +1,90 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="nl" data-theme="lemonade">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script type="module" src="app.js"></script>
   <title>Mise en Place</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5/daisyui.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
-<body>
-  <header>
-    <h1>Mise en Place</h1>
-  </header>
+<body class="bg-base-200 h-screen flex flex-col overflow-hidden">
 
-  <main>
-    <div>
-      <div id="chat-container"></div>
+  <!-- Navbar -->
+  <div class="navbar bg-base-100 shadow-sm px-4 shrink-0">
+    <div class="flex-1 gap-2">
+      <span class="text-2xl">🍳</span>
+      <span class="text-xl font-bold">Mise en Place</span>
+    </div>
+    <div class="flex-none">
+      <span id="token-info" class="text-xs text-base-content/50"></span>
+    </div>
+  </div>
 
-      <div>
-        <input id="user-input" type="text" placeholder="Wat wil je koken?" autocomplete="off" />
-        <button id="mic-btn">Spreek</button>
-        <button id="send-btn">Stuur</button>
+  <!-- Main layout -->
+  <main class="flex flex-1 gap-4 p-4 overflow-hidden">
+
+    <!-- Chat column -->
+    <div class="flex flex-col flex-1 bg-base-100 rounded-2xl shadow overflow-hidden">
+
+      <!-- Messages -->
+      <div id="chat-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-1"></div>
+
+      <!-- Input bar -->
+      <div class="p-3 border-t border-base-200 flex gap-2">
+        <button id="mic-btn" class="btn btn-circle btn-ghost text-lg" title="Spraakherkenning">🎙️</button>
+        <input
+          id="user-input"
+          type="text"
+          placeholder="Wat wil je koken vanavond?"
+          autocomplete="off"
+          class="input input-bordered flex-1"
+        />
+        <button id="send-btn" class="btn btn-primary">Stuur</button>
       </div>
     </div>
 
-    <div>
-      <div>
-        <p>Recept</p>
-        <div id="recept-panel">Nog geen recept — vraag de assistent!</div>
+    <!-- Side panels -->
+    <div class="flex flex-col gap-4 w-80 shrink-0">
+
+      <!-- Recept card -->
+      <div class="card bg-base-100 shadow flex-1 overflow-hidden">
+        <div class="card-body p-0 flex flex-col overflow-hidden">
+          <div class="p-4 pb-2 flex items-center gap-2 border-b border-base-200 shrink-0">
+            <span class="text-xl">📋</span>
+            <h2 class="card-title text-base">Recept</h2>
+          </div>
+          <div id="recept-panel" class="flex-1 overflow-y-auto p-4">
+            <div class="flex flex-col items-center justify-center h-full text-base-content/40 gap-2 py-8">
+              <span class="text-4xl">🍽️</span>
+              <p class="text-sm text-center">Nog geen recept — vraag de assistent!</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <p>Boodschappenlijst</p>
-        <div id="boodschappen-panel">Boodschappen verschijnen hier na het recept</div>
+      <!-- Boodschappen card -->
+      <div class="card bg-base-100 shadow flex-1 overflow-hidden">
+        <div class="card-body p-0 flex flex-col overflow-hidden">
+          <div class="p-4 pb-2 flex items-center gap-2 border-b border-base-200 shrink-0">
+            <span class="text-xl">🛒</span>
+            <h2 class="card-title text-base">Boodschappen</h2>
+          </div>
+          <div id="boodschappen-panel" class="flex-1 overflow-y-auto p-4">
+            <div class="flex flex-col items-center justify-center h-full text-base-content/40 gap-2 py-8">
+              <span class="text-4xl">🧺</span>
+              <p class="text-sm text-center">Boodschappen verschijnen hier na het recept</p>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
   </main>
 
-  
+  <script type="module" src="app.js"></script>
 </body>
 
 </html>
